@@ -1,11 +1,9 @@
-from random import randint
 import time
 import base64
 import pygame
 from pygame.locals import *
 import os
 from Adafruit_IO import MQTTClient
-#from adaiotmqtt import MQTTClient
 import feed
 import sys
 import signal
@@ -17,19 +15,24 @@ ADAFRUIT_IO_USERNAME = 'SECRET'  # See https://accounts.adafruit.com to find you
 PIC_FEED = 'pic'
 TEMP_FEED = 'deck-temp'
 OUT_DIR = '/home/pi/adaiot/'
+LCD_WIDTH = 320
+LCD_HEIGHT = 240
+LCD_SIZE = (LCD_WIDTH, LCD_HEIGHT)
+LUM_SAMPLE_POS = 30,220
+
+BLACK = 0,0,0
+GREEN = 0,255,0
+RED = 255,0,0
+WHITE = 255,255,255
 
 os.putenv('SDL_FBDEV', '/dev/fb1')
 os.putenv('SDL_MOUSEDRV', 'TSLIB')
 os.putenv('SDL_MOUSEDEV', '/dev/input/touchscreen')
 pygame.init()
 pygame.mouse.set_visible(False)
-lcd = pygame.display.set_mode((320, 240))
-lcd.fill((0,0,0))
+lcd = pygame.display.set_mode(LCD_SIZE)
+lcd.fill(BLACK)
 font_big = pygame.font.Font(None, 40)
-BLACK = 0,0,0
-GREEN = 0,255,0
-RED = 255,0,0
-WHITE = 255,255,255
 
 image_surface = None
 text_surface = None
@@ -43,7 +46,6 @@ def connected(client):
 
 def disconnected(client):
     print 'MQTT Disconnected from Adafruit IO!'
-    #sys.exit(1)
 
 def message(client, feed_id, payload):
     global image_surface, text_surface, lum
@@ -53,10 +55,10 @@ def message(client, feed_id, payload):
         fh.write(payload.decode('base64'))
         fh.close()
         image_surface = pygame.image.load(OUT_DIR+"testjr.jpg")
-        col = image_surface.get_at((30,220))
+        col = image_surface.get_at(LUM_SAMPLE_POS)
         lum = (0.299*col.r + 0.587*col.g + 0.114*col.b)
         # IF RESIZE REQUIRED
-        #surf = pygame.transform.scale(surf, (320, 240))
+        #surf = pygame.transform.scale(surf, LCD_SIZE)
     elif feed_id == TEMP_FEED:
         print 'MQTT received temp: {0}'.format(payload)
         if lum < 75:
@@ -71,11 +73,11 @@ def show_dash():
         if image_surface:
             lcd.blit(image_surface, (0,0))
         else:
-            lcd.fill((0,0,0))
+            lcd.fill(BLACK)
         if text_surface:
             rect = text_surface.get_rect()
             rect.x = 10
-            rect.y = 240-rect.height-2
+            rect.y = LCD_HEIGHT-rect.height-2
             lcd.blit(text_surface, rect)
     elif page == 1:
         feed_surface = pygame.image.load(OUT_DIR+"temps.png")
@@ -95,7 +97,7 @@ def switch_page():
 def signal_handler(signal, frame):
     print 'Received signal - exitting'
     sys.exit(0)
-         
+
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 

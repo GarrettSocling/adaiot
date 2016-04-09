@@ -5,7 +5,7 @@ from PIL import Image
 import base64
 
 aio = Client('SECRET')
-BASE_DIR='/home/pi/'
+BASE_DIR='/var/lib/motion/'
 SRC_FILE=BASE_DIR+'lastsnap.jpg'
 DST_FILE=BASE_DIR+'lastsmall.jpg'
 
