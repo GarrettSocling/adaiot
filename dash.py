@@ -4,8 +4,7 @@ import base64
 import pygame
 from pygame.locals import *
 import os
-#from Adafruit_IO import MQTTClient
-from adaiotmqtt import MQTTClient
+from Adafruit_IO import MQTTClient
 import feed
 import sys
 import signal
@@ -43,7 +42,6 @@ def connected(client):
 
 def disconnected(client):
     print 'MQTT Disconnected from Adafruit IO!'
-    #sys.exit(1)
 
 def message(client, feed_id, payload):
     global image_surface, text_surface, lum
@@ -95,7 +93,7 @@ def switch_page():
 def signal_handler(signal, frame):
     print 'Received signal - exitting'
     sys.exit(0)
-         
+
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
