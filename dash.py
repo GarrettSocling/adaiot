@@ -4,8 +4,8 @@ import base64
 import pygame
 from pygame.locals import *
 import os
-#from Adafruit_IO import MQTTClient
-from adaiotmqtt import MQTTClient
+from Adafruit_IO import MQTTClient
+#from adaiotmqtt import MQTTClient
 import feed
 import sys
 import signal
