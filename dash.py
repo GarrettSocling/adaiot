@@ -1,4 +1,3 @@
-from random import randint
 import time
 import base64
 import pygame
